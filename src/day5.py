@@ -12,6 +12,14 @@ def count_fresh(available: list[int], ranges):
     return sum([any([id in range_ for range_ in ranges]) for id in available])
 
 
+def combine_sets(a: set[int], b: range) -> set[int]:
+    return a.union(set(b))
+
+
+def get_all_fresh(ranges):
+    return reduce(combine_sets, ranges[1:], set(ranges[0]))
+
+
 if __name__ == "__main__":
     puzzle_input = utils.read_lines()
 
@@ -20,4 +28,4 @@ if __name__ == "__main__":
 
     print("Part 1:", count_fresh(available_ids, fresh_ranges))
 
-    print("Part 2:")
+    print("Part 2:", len(get_all_fresh(fresh_ranges)))
