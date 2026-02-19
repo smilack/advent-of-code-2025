@@ -31,7 +31,7 @@ def _read_input(day, name):
 
 
 def read_lines():
-    return read_raw().split()
+    return read_raw().rstrip("\n").split("\n")
 
 
 def read_csv():
