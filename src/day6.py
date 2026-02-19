@@ -1,6 +1,7 @@
 from operator import add, mul
 from functools import reduce
 import numpy as np
+import re
 import utils
 
 
@@ -41,13 +42,37 @@ def solve(problems):
 
 
 if __name__ == "__main__":
-    # it turns out the vertical alignment matters, so I can't strip the whitespace this early
+    # It turns out the vertical alignment matters, so I can't strip the whitespace this early.
     puzzle_input = utils.read_table()
-
     problems = np.transpose(puzzle_input)
-
     print("Part 1:", solve(problems))
 
-    part_2_problems = [transpose_numbers(p[:-1]) + [p[-1]] for p in problems]
+    puzzle_input = utils.read_lines()
 
-    print("Part 2:", solve(part_2_problems))
+    operator_places = [
+        match.start() for match in re.finditer(r"\*|\+", puzzle_input[-1])
+    ]
+
+    # The operator is always aligned with the left column:
+    # 123
+    #  45
+    #   6
+    # *
+    column_bounds = [
+        (operator_places[i - 1], operator_places[i] - 1)
+        for i in range(1, len(operator_places))
+    ]
+    column_bounds.append((operator_places[-1], len(puzzle_input[-1])))
+
+    operator_columns = [puzzle_input[-1][start:stop] for (start, stop) in column_bounds]
+    columns = [
+        [line[start:stop] for (start, stop) in column_bounds] for line in puzzle_input
+    ]
+
+    print(puzzle_input[-1])
+    print(operator_places)
+    print(column_bounds)
+    print(columns)
+
+    # part_2_problems = [transpose_numbers(p[:-1]) + [p[-1]] for p in problems]
+    # print("Part 2:", solve(part_2_problems))
