@@ -8,16 +8,14 @@ def make_range(s):
     return range(low, high + 1)
 
 
-def count_fresh(available: list[int], ranges):
+def count_fresh(available: list[int] | range, ranges: list[range]):
     return sum([any([id in range_ for range_ in ranges]) for id in available])
 
 
-def combine_sets(a: set[int], b: range) -> set[int]:
-    return a.union(set(b))
-
-
-def get_all_fresh(ranges):
-    return reduce(combine_sets, ranges[1:], set(ranges[0]))
+def get_full_range(ranges):
+    lowest = min([r.start for r in ranges])
+    highest = max([r.stop for r in ranges])
+    return range(lowest, highest)
 
 
 if __name__ == "__main__":
@@ -28,4 +26,8 @@ if __name__ == "__main__":
 
     print("Part 1:", count_fresh(available_ids, fresh_ranges))
 
-    print("Part 2:", len(get_all_fresh(fresh_ranges)))
+    full_range = get_full_range(fresh_ranges)
+    num_fresh = count_fresh(full_range, fresh_ranges)
+    # print("Full range length:", len(full_range))
+    # print("Number of ranges:", len(fresh_ranges))
+    print("Part 2:", num_fresh)
