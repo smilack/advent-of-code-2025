@@ -39,7 +39,7 @@ def read_csv():
 
 
 def read_matrix():
-    return [line.split() for line in read_lines()]
+    return [list(line) for line in read_lines()]
 
 
 def read_raw():
