@@ -12,6 +12,15 @@ def adjacent(matrix, r, c):
     return cells
 
 
+def adjacent2(matrix, r, c):
+    return [
+        matrix[r_][c_]
+        for r_ in [r - 1, r, r + 1]
+        for c_ in [c - 1, c, c + 1]
+        if 0 <= r_ < len(matrix) and 0 <= c_ < len(matrix[r_]) and (r_ != r or c_ != c)
+    ]
+
+
 def valid_roll(matrix, r, c):
     return matrix[r][c] == "@" and adjacent(matrix, r, c).count("@") < 4
 
