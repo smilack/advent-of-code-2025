@@ -1,13 +1,16 @@
 from utils import read_csv
 from sys import argv
 
+
 def to_range(s):
-    low, high = s.split('-')
+    low, high = s.split("-")
     return range(int(low), int(high) + 1)
+
 
 def is_invalid(i):
     mid = len(i) // 2
     return i[mid:] == i[:mid]
+
 
 if __name__ == "__main__":
     if len(argv) < 2:
@@ -23,7 +26,7 @@ if __name__ == "__main__":
 
     # Part 1
     ranges = [to_range(s) for s in puzzle_input]
-    invalid = [x for rs in ranges for x in rs if is_invalid(str(x))]
+    invalid = [x for range_ in ranges for x in range_ if is_invalid(str(x))]
     print(sum(invalid))
 
     # Part 2
