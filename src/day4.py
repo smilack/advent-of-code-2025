@@ -33,10 +33,42 @@ def part1(matrix):
     ].count(True)
 
 
+def flatten(matrix):
+    return "".join(map("".join, matrix))
+
+
+def remove_rolls(matrix) -> tuple[list[list[str]], int]:
+    initial_rolls = flatten(matrix).count("@")
+
+    new_matrix = [
+        [
+            "." if valid_roll(matrix, r, c) else matrix[r][c]
+            for c in range(len(matrix[r]))
+        ]
+        for r in range(len(matrix))
+    ]
+
+    final_rolls = flatten(new_matrix).count("@")
+    return (new_matrix, initial_rolls - final_rolls)
+
+
+def part2(matrix):
+    total_removed = 0
+    matrix, removed = remove_rolls(matrix)
+
+    while removed > 0:
+        total_removed += removed
+        matrix, removed = remove_rolls(matrix)
+
+    return matrix, total_removed
+
+
 if __name__ == "__main__":
     puzzle_input = utils.read_matrix()
 
     print("Part 1:", part1(puzzle_input))
     # print("\n".join(map("".join, puzzle_input)))
 
-    print("Part 2:")
+    new_matrix, removed = part2(puzzle_input)
+    print("Part 2:", removed)
+    # print("\n".join(map("".join, new_matrix)))
