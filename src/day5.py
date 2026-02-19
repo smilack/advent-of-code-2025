@@ -8,24 +8,16 @@ def make_range(s):
     return range(low, high + 1)
 
 
-def combine_ranges(a, b):
-    return set(a).union(set(b))
-
-
-def get_fresh_ids(range_strings):
-    ranges = map(make_range, range_strings)
-    return reduce(combine_ranges, ranges)
+def count_fresh(available: list[int], ranges):
+    return sum([any([id in range_ for range_ in ranges]) for id in available])
 
 
 if __name__ == "__main__":
     puzzle_input = utils.read_lines()
 
-    fresh_ids = get_fresh_ids([s for s in puzzle_input if "-" in s])
-    print(fresh_ids)
-
+    fresh_ranges = [make_range(s) for s in puzzle_input if "-" in s]
     available_ids = [int(s) for s in puzzle_input if s.isnumeric()]
-    print(", ".join(map(str, available_ids)))
 
-    print("Part 1:", sum([id in fresh_ids for id in available_ids]))
+    print("Part 1:", count_fresh(available_ids, fresh_ranges))
 
     print("Part 2:")
