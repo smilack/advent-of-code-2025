@@ -38,6 +38,10 @@ def read_csv():
     return [v.strip() for v in read_raw().split(",")]
 
 
+def read_matrix():
+    return [line.split() for line in read_lines()]
+
+
 def read_raw():
     try:
         file_name = argv[0]
