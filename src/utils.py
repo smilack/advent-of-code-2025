@@ -39,7 +39,13 @@ def read_csv():
 
 
 def read_matrix():
+    """Split input into 2d array of single-character strings."""
     return [list(line) for line in read_lines()]
+
+
+def read_table():
+    """Split input into 2d array of whitespace-delimited values."""
+    return [line.split() for line in read_raw().rstrip().split("\n")]
 
 
 def read_raw():
