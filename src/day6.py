@@ -17,13 +17,37 @@ def solve_problem(problem):
     return reduce(operator, operands)
 
 
+def transpose_numbers(problem):
+    """Transpose the digits of a list of numbers.
+
+    For example:
+        123
+         45
+          6
+        ["123", "45", "6"] becomes ["356", "24", "1"]
+
+        328
+        64
+        98
+        ["328", "64", "98"] becomes ["8", "248", "369"]
+    """
+    transposed = np.transpose([number.split() for number in problem])
+    converted = ["".join(line).strip() for line in transposed]
+    return converted
+
+
+def solve(problems):
+    return sum(map(solve_problem, problems))
+
+
 if __name__ == "__main__":
+    # it turns out the vertical alignment matters, so I can't strip the whitespace this early
     puzzle_input = utils.read_table()
 
     problems = np.transpose(puzzle_input)
 
-    solutions = [solve_problem(p) for p in problems]
+    print("Part 1:", solve(problems))
 
-    print("Part 1:", sum(solutions))
+    part_2_problems = [transpose_numbers(p[:-1]) + [p[-1]] for p in problems]
 
-    print("Part 2:")
+    print("Part 2:", solve(part_2_problems))
