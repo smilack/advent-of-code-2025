@@ -52,7 +52,7 @@ if __name__ == "__main__":
         input_name = argv[1]
 
     try:
-        puzzle_input = read_csv(2, input_name)
+        puzzle_input = read_csv()
     except FileNotFoundError:
         raise SystemExit
 

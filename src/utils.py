@@ -1,8 +1,11 @@
 from os import path, listdir
+from sys import argv
+import re
 
 INPUT_DIR = path.join(path.dirname(path.dirname(path.abspath(__file__))), "input")
 
-def read_input(day, name):
+
+def _read_input(day, name):
     try:
         directory = path.join(INPUT_DIR, str(day))
         file_path = path.join(directory, name)
@@ -10,8 +13,8 @@ def read_input(day, name):
             text = f.read()
         return text
     except FileNotFoundError:
-        print(f"Could not find input \"{name}\" for day {day}.")
-        
+        print(f'Could not find input "{name}" for day {day}.')
+
         if path.exists(directory):
             files = listdir(directory)
         else:
@@ -20,16 +23,35 @@ def read_input(day, name):
         if len(files) == 0:
             print("No input options available for {day}.")
         else:
-            print(f"Input options are:")
+            print("Input options are:")
             for f in files:
                 print("-", f)
 
-        raise
+        raise SystemExit
 
-def read_lines(day, name):
-    text = read_input(day, name)
-    return text.split()
 
-def read_csv(day, name):
-    text = read_input(day, name)
-    return [v.strip() for v in text.split(",")]
+def read_lines():
+    return read_raw().split()
+
+
+def read_csv():
+    return [v.strip() for v in read_raw().split(",")]
+
+
+def read_raw():
+    try:
+        file_name = argv[0]
+        input_name = argv[1]
+    except IndexError:
+        print("Not enough arguments. Please provide both script and input file names")
+        raise SystemExit
+
+    pattern = r"(?P<day>[\d]+)\.py"
+    found = re.search(pattern, file_name)
+    if found and found["day"]:
+        day = found["day"]
+    else:
+        print("Could not determine puzzle day. Is it in the file name?")
+        raise SystemExit
+
+    return _read_input(day, input_name)
