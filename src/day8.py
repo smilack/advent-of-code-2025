@@ -33,6 +33,8 @@ def find_distances(points: list[Point]) -> list[Pair]:
 
 
 def connect_circuits(circuits: list[Circuit], distances: list[Pair]):
+    """Connect the closest remaining pair of points by adding them to a single set, and combining any existing sets that they may be a part of, then return the two points."""
+
     # closest remaining pair
     _, a, b = distances.pop()
     new_circuit: Circuit = {a, b}
@@ -53,6 +55,8 @@ def connect_circuits(circuits: list[Circuit], distances: list[Pair]):
             added_to[0] |= c
             circuits.remove(c)
 
+    return a, b
+
 
 type Point = tuple[int, ...]
 type Pair = tuple[float, Point, Point]
@@ -66,7 +70,7 @@ if __name__ == "__main__":
 
     distances = find_distances(points)
 
-    circuits = []
+    circuits = [{p} for p in points]
     for _ in range(connections()):
         connect_circuits(circuits, distances)
 
@@ -75,4 +79,8 @@ if __name__ == "__main__":
 
     print("Part 1:", product)
 
-    # print("Part 2:")
+    c1, c2 = (0,), (0,)
+    while len(circuits) > 1:
+        c1, c2 = connect_circuits(circuits, distances)
+
+    print("Part 2:", c1[0] * c2[0])
