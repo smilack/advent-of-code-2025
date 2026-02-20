@@ -26,7 +26,7 @@ def drip_from(matrix: list[list[str]], position: tuple[int, int]):
 
     symbol = matrix[row][col]
 
-    if symbol == BLANK or symbol == DOWN:
+    if symbol in [BLANK, DOWN, LEFT, RIGHT, BOTH]:
         matrix[row][col] = DOWN
         return drip_from(matrix, (row, col))
 
