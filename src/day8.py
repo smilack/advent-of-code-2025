@@ -1,16 +1,13 @@
-from typing import Any
 from math import sqrt
 from functools import reduce
 from operator import mul
 import utils
-from sys import setrecursionlimit
 
 
 def connections():
     if utils.input_type() == "example":
         return 10
     elif utils.input_type() == "real":
-        setrecursionlimit(1002)
         return 1000
     else:
         return 0
@@ -24,7 +21,7 @@ def distance(a: Point, b: Point):
     return sqrt(sum([(i - j) ** 2 for i, j in zip(a, b)]))
 
 
-def find_distances(point: list[Point]) -> list[Pair]:
+def find_distances(points: list[Point]) -> list[Pair]:
     """Return a list of (distance, point a, point b) for each pair of points.
 
     Sorted with the closest points at the end, for easy popping.
@@ -35,10 +32,7 @@ def find_distances(point: list[Point]) -> list[Pair]:
     )
 
 
-def connect_circuits(remaining: int, circuits: list[Circuit], distances: list[Pair]):
-    if remaining == 0:
-        return
-
+def connect_circuits(circuits: list[Circuit], distances: list[Pair]):
     # closest remaining pair
     _, a, b = distances.pop()
     new_circuit: Circuit = {a, b}
@@ -59,8 +53,6 @@ def connect_circuits(remaining: int, circuits: list[Circuit], distances: list[Pa
             added_to[0] |= c
             circuits.remove(c)
 
-    connect_circuits(remaining - 1, circuits, distances)
-
 
 type Point = tuple[int, ...]
 type Pair = tuple[float, Point, Point]
@@ -75,7 +67,8 @@ if __name__ == "__main__":
     distances = find_distances(points)
 
     circuits = []
-    connect_circuits(connections(), circuits, distances)
+    for _ in range(connections()):
+        connect_circuits(circuits, distances)
 
     three_largest = sorted(map(len, circuits), reverse=True)[:3]
     product = reduce(mul, three_largest)
