@@ -5,7 +5,16 @@ import re
 INPUT_DIR = path.join(path.dirname(path.dirname(path.abspath(__file__))), "input")
 
 
+def input_type():
+    try:
+        return argv[1]
+    except IndexError:
+        return ""
+
+
 def _read_input(day, name):
+    directory = ""
+
     try:
         directory = path.join(INPUT_DIR, str(day))
         file_path = path.join(directory, name)
