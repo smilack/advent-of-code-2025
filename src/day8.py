@@ -1,15 +1,16 @@
 from typing import Any
-from numpy._typing import NDArray
-import numpy as np
+from math import sqrt
 from functools import reduce
 from operator import mul
 import utils
+from sys import setrecursionlimit
 
 
 def connections():
     if utils.input_type() == "example":
         return 10
     elif utils.input_type() == "real":
+        setrecursionlimit(1002)
         return 1000
     else:
         return 0
@@ -19,8 +20,8 @@ def print_points(points):
     [print(f"({x}, {y}, {z})") for (x, y, z) in points]
 
 
-def distance(a: Point, b: Point) -> np.floating[Any]:
-    return np.linalg.norm(a - b)
+def distance(a: Point, b: Point):
+    return sqrt(sum([(i - j) ** 2 for i, j in zip(a, b)]))
 
 
 def find_distances(point: list[Point]) -> list[Pair]:
@@ -40,26 +41,43 @@ def connect_circuits(remaining: int, circuits: list[Circuit], distances: list[Pa
 
     # closest remaining pair
     _, a, b = distances.pop()
-    new_circuit: Circuit = { a, b }
+    new_circuit: Circuit = {a, b}
 
+    # check overlap with existing circuits
+    added_to = []
     for circuit in circuits:
-        if
+        if not circuit.isdisjoint(new_circuit):
+            circuit |= new_circuit
+            added_to.append(circuit)
+
+    # add to list
+    if not added_to:
+        circuits.append(new_circuit)
+    # or add to & consolidate existing circuits
+    else:
+        for c in added_to[1:]:
+            added_to[0] |= c
+            circuits.remove(c)
+
+    connect_circuits(remaining - 1, circuits, distances)
 
 
-type Point = NDArray[np.floating[Any]]
-type Pair = tuple[np.floating[Any], Point, Point]
+type Point = tuple[int, ...]
+type Pair = tuple[float, Point, Point]
 type Circuit = set[Point]
+
 
 if __name__ == "__main__":
     puzzle_input = utils.read_lines()
 
-    points: list[Point] = [np.fromstring(s, sep=",") for s in puzzle_input]
+    points: list[Point] = [tuple(map(int, line.split(","))) for line in puzzle_input]
+
     distances = find_distances(points)
 
     circuits = []
     connect_circuits(connections(), circuits, distances)
 
-    three_largest = sorted(circuits, key=len, reverse=True)[:3]
+    three_largest = sorted(map(len, circuits), reverse=True)[:3]
     product = reduce(mul, three_largest)
 
     print("Part 1:", product)
