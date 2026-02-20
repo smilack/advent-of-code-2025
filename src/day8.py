@@ -2,6 +2,15 @@ import utils
 import numpy as np
 
 
+def connections():
+    if utils.input_type() == "example":
+        return 10
+    elif utils.input_type() == "real":
+        return 1000
+    else:
+        return 0
+
+
 def print_points(points):
     [print(f"({x}, {y}, {z})") for (x, y, z) in points]
 
