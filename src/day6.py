@@ -65,21 +65,12 @@ if __name__ == "__main__":
     # (m, p)
     column_bounds.append((operator_places[-1], len(puzzle_input[-1])))
 
-    # operator_columns = [puzzle_input[-1][start:stop] for (start, stop) in column_bounds]
     columns = [
         [line[start:stop] for (start, stop) in column_bounds] for line in puzzle_input
     ]
 
-    # print(puzzle_input[-1])
-    # print(operator_places)
-    # print(column_bounds)
-    # print(columns)
-
     problems = np.transpose(columns)
     print("Part 1:", solve(problems))
 
-    [print(p) for p in problems]
-
     part_2_problems = [transpose_numbers(p[:-1]) + [p[-1]] for p in problems]
-    [print(p) for p in part_2_problems]
     print("Part 2:", solve(part_2_problems))
