@@ -16,6 +16,10 @@ def draw_grid(red_tiles):
     print("\n".join(map("".join, tiles)))
 
 
+def difference(a, b):
+    return 1 + abs(a - b)
+
+
 if __name__ == "__main__":
     puzzle_input = utils.read_lines()
 
@@ -25,4 +29,9 @@ if __name__ == "__main__":
     if utils.input_type() == "example":
         draw_grid(red_tiles)
 
-    print("Part 1:")
+    combinations = [(a, b) for i, a in enumerate(red_tiles) for b in red_tiles[:i]]
+    areas = [
+        difference(x1, x2) * difference(y1, y2) for ((x1, y1), (x2, y2)) in combinations
+    ]
+
+    print("Part 1:", max(areas))
