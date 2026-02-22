@@ -1,11 +1,10 @@
 import parser12
 
+
 if __name__ == "__main__":
     tree = parser12.get_input()
-
-    print(tree["presents"])
-
-    print(tree["regions"])
+    parser12.print_presents(tree["presents"])
+    parser12.print_regions(tree["regions"])
 
     print("Part 1:")
 
