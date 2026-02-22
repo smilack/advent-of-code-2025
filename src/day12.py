@@ -2,33 +2,23 @@ from lark import Lark, Transformer
 import utils
 
 
+# I don't know if this is what this is supposed to look like, but it *does* work
 class PuzzleTree(Transformer):
     NUM = int
-
-    # def full(self, _):
-    #     return True
-
-    # def empty(self, _):
-    #     return False
-
-    def row(self, row):
-        return [x.data.value for x in row]
-
-    # row = list
-    shape = list
-    present = tuple
-    presents = dict
-
-    dimensions = tuple
 
     def start(self, start):
         return {"presents": start[0], "regions": start[1]}
 
-    required = list
+    presents = dict
+    present = tuple
 
-    region = tuple
+    def shape(self, shape):
+        return [[c == "#" for c in row] for row in shape]
 
     regions = list
+    region = tuple
+    dimensions = tuple
+    required = list
 
 
 if __name__ == "__main__":

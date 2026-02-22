@@ -1,3 +1,5 @@
+NUM: "0".."9"+
+
 start: presents "\n" regions "\n"*
 
 presents: present ("\n" present)*
@@ -8,13 +10,11 @@ regions: (region "\n")+
 
 present: NUM ":\n" shape
 
-shape: (row "\n")+
+shape: (ROW "\n")+
 
-row: (full | empty)+
+ROW: PIECE+
 
-full: "#"
-
-empty: "."
+PIECE: "." | "#"
 
 // tree regions
 
@@ -23,5 +23,3 @@ region: dimensions ":" required
 dimensions: NUM "x" NUM
 
 required: (" " NUM)+
-
-NUM: "0".."9"+
