@@ -9,24 +9,25 @@ YELLOW = "🟨"
 
 
 def steps(a, b):
-    if a == b:
+    if a < b:
+        return range(a, b, 1)
+    elif a > b:
+        return range(a, b, -1)
+    else:
         return [a]
-    else:
-        return range(a, b, (b - a) // abs(b - a))
-
-
-def repeating_zip(a, b):
-    if len(a) > len(b):
-        return zip(a, cycle(b))
-    elif len(b) > len(a):
-        return zip(cycle(a), b)
-    else:
-        return zip(a, b)
 
 
 def get_path(a, b):
     (x1, y1), (x2, y2) = a, b
-    return list(repeating_zip(steps(x1, x2), steps(y1, y2)))
+    x_steps = steps(x1, x2)
+    y_steps = steps(y1, y2)
+    if isinstance(x_steps, list) and len(x_steps) == 1:
+        path = zip(x_steps * len(y_steps), y_steps)
+    elif isinstance(y_steps, list) and len(y_steps) == 1:
+        path = zip(x_steps, y_steps * len(x_steps))
+    else:
+        path = zip(x_steps, y_steps)
+    return list(path)
 
 
 def is_edge(s):
@@ -41,7 +42,7 @@ def evaluate_grid(red_tiles):
     xs = [p[0] for p in red_tiles]
     ys = [p[1] for p in red_tiles]
 
-    tiles = [[BLACK for _ in range(max(xs) + 1)] for _ in range(max(ys) + 1)]
+    tiles = [[BLACK] * (max(xs) + 1) for _ in range(max(ys) + 1)]
 
     for (x1, y1), end in pairwise(red_tiles + [red_tiles[0]]):
         tiles[y1][x1] = RED
