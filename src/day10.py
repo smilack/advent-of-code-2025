@@ -26,6 +26,11 @@ class Machine:
             [i in button for i in range(len(self.lights))] for button in button_numbers
         ]
 
+        # joltage basically same as buttons but only one entry
+        self.joltage_counters = [
+            int(n) for n in findall(r"{([\d,]+)}", config)[0].split(",")
+        ]
+
     def activate(self):
         results = self.buttons
         depth = 1
@@ -45,11 +50,49 @@ class Machine:
     def __press(self, button, lights):
         return [light ^ b for (light, b) in zip(lights, button)]
 
+    def jolt(self):
+        results = self.buttons
+        depth = 1
+
+        while self.joltage_counters not in results:
+            print(f"{len(results)} options tried with {depth} depth")
+            depth += 1
+
+            new_results = []
+
+            for r in results:
+                for button in self.buttons:
+                    new_result = self.__jolt_press(button, r)
+                    if new_result == self.joltage_counters:
+                        print(f"Machine {self.id} jolted with {depth} presses")
+                        return depth
+
+                    if all(
+                        [
+                            new_result[i] <= self.joltage_counters[i]
+                            for i in range(len(r))
+                        ]
+                    ):
+                        new_results.append(new_result)
+
+            results = new_results
+
+        return depth
+
+    def __jolt_press(self, button, counters):
+        # taking advantage of True/False implicit conversion to 1/0
+        return [counter + b for (counter, b) in zip(counters, button)]
+
 
 if __name__ == "__main__":
     puzzle_input = utils.read_lines()
 
-    presses = sum([Machine(config).activate() for config in puzzle_input])
-    print("Part 1:", presses)
+    machines = [Machine(config) for config in puzzle_input]
 
-    print("Part 2:")
+    activation_presses = sum([machine.activate() for machine in machines])
+
+    print("Part 1:", activation_presses)
+
+    joltage_presses = sum([machine.jolt() for machine in machines])
+
+    print("Part 2:", joltage_presses)
