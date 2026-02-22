@@ -36,6 +36,7 @@ def print_present(pres):
 def print_presents(presents):
     for i, p in presents.items():
         print(f"Present {i}:")
+        print(" Area:", sum([sum(row) for row in p]))
         print_present(p)
         print()
 
