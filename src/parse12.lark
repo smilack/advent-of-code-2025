@@ -1,0 +1,27 @@
+start: presents "\n" regions "\n"*
+
+presents: present ("\n" present)*
+
+regions: (region "\n")+
+
+// present definitions
+
+present: NUM ":\n" shape
+
+shape: (row "\n")+
+
+row: (full | empty)+
+
+full: "#"
+
+empty: "."
+
+// tree regions
+
+region: dimensions ":" required
+
+dimensions: NUM "x" NUM
+
+required: (" " NUM)+
+
+NUM: "0".."9"+
