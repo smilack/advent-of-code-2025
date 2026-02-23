@@ -37,6 +37,7 @@ class Machine:
 
         while self.lights not in results:
             depth += 1
+            # this is slow because it calculates all the results before checking if any is the answer
             results = [
                 self.__press(button, result)
                 for result in results
@@ -60,6 +61,8 @@ class Machine:
 
             new_results = []
 
+            # this at least tries to cut corners by checking each result as it's generated, but it still takes a ridiculous number of tries to find an answer
+            # I don't know if a DFS with caching would work here
             for r in results:
                 for button in self.buttons:
                     new_result = self.__jolt_press(button, r)
