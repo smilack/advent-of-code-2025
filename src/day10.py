@@ -53,6 +53,8 @@ class Machine:
 
     def jolt(self):
         results = self.buttons
+        # lower bound: highest counter
+        # return max(self.joltage_counters)
         depth = 1
 
         while self.joltage_counters not in results:
@@ -63,6 +65,23 @@ class Machine:
 
             # this at least tries to cut corners by checking each result as it's generated, but it still takes a ridiculous number of tries to find an answer
             # I don't know if a DFS with caching would work here
+            #
+            # multiplication???
+            # something, something, system of equations? matrix?
+            #
+            #     (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
+            #
+            #     A * [0, 0, 0, 1]
+            #   + B * [0, 1, 0, 1]
+            #   + C * [0, 0, 1, 0]
+            #   + D * [0, 0, 1, 1]
+            #   + E * [1, 0, 1, 0]
+            #   + F * [1, 1, 0, 0]
+            #   ------------------
+            #   =     [3, 5, 4, 7]
+            #
+            #   0 <= k <= max(counter)
+            #
             for r in results:
                 for button in self.buttons:
                     new_result = self.__jolt_press(button, r)
