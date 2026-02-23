@@ -44,7 +44,7 @@ class Machine:
                 for button in self.buttons
             ]
 
-        print(f"Machine {self.id} activated with {depth} presses")
+        # print(f"Machine {self.id} activated with {depth} presses")
 
         return depth
 
@@ -52,6 +52,12 @@ class Machine:
         return [light ^ b for (light, b) in zip(lights, button)]
 
     def jolt(self):
+        print("Machine", self.id, "joltages:\n")
+        show_joltage_matrices(self.buttons, self.joltage_counters)
+
+        return 0
+
+    def jolt_bfs(self):
         results = self.buttons
         # lower bound: highest counter
         # return max(self.joltage_counters)
@@ -106,14 +112,57 @@ class Machine:
         return [counter + b for (counter, b) in zip(counters, button)]
 
 
+def show_joltage_matrices(buttons, joltage_counters):
+    output = []
+
+    number_length = max([len(str(n)) for n in joltage_counters])
+    for i, button in enumerate(buttons):
+        output.append(vector_to_str(i, button, number_length))
+
+    output_width = len(output[-1])
+    output.append("—" * output_width)
+
+    # it's hacky but 'A' - 4 = '='
+    output.append(vector_to_str(-4, joltage_counters, number_length))
+    output.append("")
+
+    eq_matrix = transpose(buttons)
+    eq_joltages = transpose([joltage_counters])
+    for i, (equation, joltage) in enumerate(zip(eq_matrix, eq_joltages)):
+        output.append(equation_to_str(equation) + " = " + str(joltage[0]))
+
+    print("\n".join(output), "\n")
+
+
+def vector_to_str(index, vector, number_length):
+    contents = " ".join([str(int(i)).rjust(number_length, " ") for i in vector])
+    return f"{letter(index)} [ {contents} ]"
+
+
+def equation_to_str(equation):
+    return (
+        "sum( "
+        + " ".join([letter(i) if x else " " for i, x in enumerate(equation)])
+        + " )"
+    )
+
+
+def letter(i: int):
+    return chr(i + ord("A"))
+
+
+def transpose(matrix: list[list]):
+    return [[row[c] for row in matrix] for c in range(len(matrix[0]))]
+
+
 if __name__ == "__main__":
     puzzle_input = utils.read_lines()
 
     machines = [Machine(config) for config in puzzle_input]
 
-    activation_presses = sum([machine.activate() for machine in machines])
+    # activation_presses = sum([machine.activate() for machine in machines])
 
-    print("Part 1:", activation_presses)
+    # print("Part 1:", activation_presses)
 
     joltage_presses = sum([machine.jolt() for machine in machines])
 
