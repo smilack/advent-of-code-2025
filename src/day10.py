@@ -1,5 +1,6 @@
-from itertools import count, product
-from functools import reduce
+from typing import Iterable
+from itertools import count, product, compress, starmap
+from functools import reduce, partial
 from operator import mul
 from re import findall
 import utils
@@ -54,29 +55,38 @@ class Machine:
         return [light ^ b for (light, b) in zip(lights, button)]
 
     def jolt(self):
-        # print("Machine", self.id, "joltages:\n")
-        # show_joltage_matrices(self.buttons, self.joltage_counters)
+        print("Machine", self.id, "joltages:\n")
+        show_joltage_matrices(self.buttons, self.joltage_counters)
 
+        # the upper bound for presses for a button is the lowest counter that the button affects
         button_maxima = [
-            min([self.joltage_counters[i] for i in range(len(button)) if button[i]])
-            for button in self.buttons
+            min(compress(self.joltage_counters, button)) for button in self.buttons
         ]
 
-        print(button_maxima)
+        # print(button_maxima)
         options = reduce(mul, button_maxima)
 
+        eq_matrix = transpose(self.buttons)
         press_ranges = [range(m + 1) for m in button_maxima]
         best = button_maxima
         tested = 0
-        for current in product(*press_ranges):
+
+        press_combinations = filter(
+            press_filter(eq_matrix, self.joltage_counters, count()),
+            product(*press_ranges),
+        )
+        for current in press_combinations:
             tested += 1
-            if tested % 100000 == 0:
+            if tested % 1_000_000 == 0:
                 print(f"Tested {tested:,} / {options - tested:,}")
+
             if sum(current) >= sum(best):
                 continue
+
             elif test(current, self.buttons, self.joltage_counters):
                 best = current
 
+        print(self.id, ":", sum(best))
         return sum(best)
 
     def jolt_bfs(self):
@@ -134,7 +144,7 @@ class Machine:
         return [counter + b for (counter, b) in zip(counters, button)]
 
 
-def zip_sum(*args: list[int]) -> list[int]:
+def zip_sum(*args: Iterable[int]) -> Iterable[int]:
     return list(map(sum, zip(*args)))
 
 
@@ -143,11 +153,45 @@ def scale(k: int, lst: list[bool]) -> list[int]:
 
 
 def test(
-    presses: tuple[int, ...], buttons: list[list[bool]], targets: list[int]
+    presses: Iterable[int], buttons: list[list[bool]], targets: Iterable[int]
 ) -> bool:
     return targets == zip_sum(
         *[scale(k, button) for k, button in zip(presses, buttons)]
     )
+
+
+def press_filter(equations, results, counter):
+    total = satisfies_total(equations, results)
+    equalities = satisfies_equalities(equations, results)
+
+    def fil(press):
+        c = next(counter)
+        if c > 0 and c % 5_000_000 == 0:
+            print(f"Filtered {c:,}")
+        return total(press) and equalities(press)
+
+    return fil
+
+
+def satisfies_total(equations, results):
+    total_eqn = zip_sum(*equations)
+    total_result = sum(results)
+
+    def calculate(press):
+        lhs = sum([p * k for p, k in zip(press, total_eqn)])
+        return lhs == total_result
+
+    return calculate
+
+
+def satisfies_equalities(equations, results):
+    def check(presses):
+        for equation, result in zip(equations, results):
+            if sum(compress(presses, equation)) != result:
+                return False
+        return True
+
+    return check
 
 
 def show_joltage_matrices(buttons, joltage_counters):
@@ -165,13 +209,20 @@ def show_joltage_matrices(buttons, joltage_counters):
     output.append("")
 
     eq_matrix = transpose(buttons)
-    eq_joltages = transpose([joltage_counters])
-    for i, (equation, joltage) in enumerate(zip(eq_matrix, eq_joltages)):
-        output.append(equation_to_str(equation) + " = " + str(joltage[0]))
+    for i, (equation, joltage) in enumerate(zip(eq_matrix, joltage_counters)):
+        output.append(equation_to_str(equation) + " = " + str(joltage))
     output.append("")
 
+    total_eqn = zip_sum(*eq_matrix)
+    total_result = sum(joltage_counters)
+    output.append(
+        " + ".join([f"{k}{letter(i)}" for i, k in enumerate(total_eqn)])
+        + " = "
+        + str(total_result)
+    )
+
     for i, button in enumerate(buttons):
-        counters = [joltage_counters[j] for j in range(len(button)) if button[j]]
+        counters = list(compress(joltage_counters, button))
         output.append(
             f"max({letter(i)}) = min({','.join(map(str, counters))}) = {min(counters)}"
         )
@@ -209,6 +260,6 @@ if __name__ == "__main__":
 
     # print("Part 1:", activation_presses)
 
-    joltage_presses = sum([machine.jolt() for machine in machines])
+    joltage_presses = sum([machine.jolt() for machine in machines][:1])
 
     print("Part 2:", joltage_presses)
