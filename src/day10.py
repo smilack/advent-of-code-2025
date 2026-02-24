@@ -1,6 +1,6 @@
 from typing import Iterable
-from itertools import count, product, compress, starmap
-from functools import reduce, partial
+from itertools import count, product, compress, chain, combinations
+from functools import reduce
 from operator import mul
 from re import findall
 import utils
@@ -70,6 +70,19 @@ class Machine:
         press_ranges = [range(m + 1) for m in button_maxima]
         best = button_maxima
         tested = 0
+
+        power_eqs = filter(None, powerset(zip(eq_matrix, self.joltage_counters)))
+        for eq_set in power_eqs:
+            eqs, res = zip(*eq_set)
+            tot_eq = zip_sum(*eqs)
+            tot_re = sum(res)
+            print(
+                " ".join(
+                    [f"{k}{letter(i)}" if k else "  " for i, k in enumerate(tot_eq)]
+                ),
+                "=",
+                tot_re,
+            )
 
         press_combinations = filter(
             press_filter(eq_matrix, self.joltage_counters, count()),
@@ -142,6 +155,17 @@ class Machine:
     def __jolt_press(self, button, counters):
         # taking advantage of True/False implicit conversion to 1/0
         return [counter + b for (counter, b) in zip(counters, button)]
+
+
+def add_eqns():
+    pass
+
+
+def powerset(iterable):
+    # from https://docs.python.org/3/library/itertools.html
+    "Subsequences of the iterable from shortest to longest."
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
 
 def zip_sum(*args: Iterable[int]) -> Iterable[int]:
