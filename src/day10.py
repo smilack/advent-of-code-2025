@@ -3,7 +3,7 @@ from itertools import count, product, compress, chain, combinations
 from functools import reduce
 from operator import mul
 from re import findall
-from iterables import zip_sum, scale
+from iterables import zip_sum, scale, transpose
 import utils
 
 
@@ -262,10 +262,6 @@ def equation_to_str(equation):
 
 def letter(i: int):
     return chr(i + ord("A"))
-
-
-def transpose(matrix: list[list]):
-    return [[row[c] for row in matrix] for c in range(len(matrix[0]))]
 
 
 if __name__ == "__main__":
