@@ -3,6 +3,7 @@ from itertools import count, product, compress, chain, combinations
 from functools import reduce
 from operator import mul
 from re import findall
+from iterables import zip_sum, scale
 import utils
 
 
@@ -166,14 +167,6 @@ def powerset(iterable):
     "Subsequences of the iterable from shortest to longest."
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
-
-
-def zip_sum(*args: Iterable[int]) -> Iterable[int]:
-    return list(map(sum, zip(*args)))
-
-
-def scale(k: int, lst: list[bool]) -> list[int]:
-    return [k * x for x in lst]
 
 
 def test(
