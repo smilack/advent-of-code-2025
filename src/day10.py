@@ -1,10 +1,12 @@
-import itertools
+from itertools import count, product
+from functools import reduce
+from operator import mul
 from re import findall
 import utils
 
 
 class Machine:
-    id_iter = itertools.count()
+    id_iter = count()
 
     def __init__(self, config):
         self.id = next(Machine.id_iter)
@@ -52,10 +54,30 @@ class Machine:
         return [light ^ b for (light, b) in zip(lights, button)]
 
     def jolt(self):
-        print("Machine", self.id, "joltages:\n")
-        show_joltage_matrices(self.buttons, self.joltage_counters)
+        # print("Machine", self.id, "joltages:\n")
+        # show_joltage_matrices(self.buttons, self.joltage_counters)
 
-        return 0
+        button_maxima = [
+            min([self.joltage_counters[i] for i in range(len(button)) if button[i]])
+            for button in self.buttons
+        ]
+
+        print(button_maxima)
+        options = reduce(mul, button_maxima)
+
+        press_ranges = [range(m + 1) for m in button_maxima]
+        best = button_maxima
+        tested = 0
+        for current in product(*press_ranges):
+            tested += 1
+            if tested % 100000 == 0:
+                print(f"Tested {tested:,} / {options - tested:,}")
+            if sum(current) >= sum(best):
+                continue
+            elif test(current, self.buttons, self.joltage_counters):
+                best = current
+
+        return sum(best)
 
     def jolt_bfs(self):
         results = self.buttons
@@ -112,6 +134,22 @@ class Machine:
         return [counter + b for (counter, b) in zip(counters, button)]
 
 
+def zip_sum(*args: list[int]) -> list[int]:
+    return list(map(sum, zip(*args)))
+
+
+def scale(k: int, lst: list[bool]) -> list[int]:
+    return [k * x for x in lst]
+
+
+def test(
+    presses: tuple[int, ...], buttons: list[list[bool]], targets: list[int]
+) -> bool:
+    return targets == zip_sum(
+        *[scale(k, button) for k, button in zip(presses, buttons)]
+    )
+
+
 def show_joltage_matrices(buttons, joltage_counters):
     output = []
 
@@ -130,6 +168,13 @@ def show_joltage_matrices(buttons, joltage_counters):
     eq_joltages = transpose([joltage_counters])
     for i, (equation, joltage) in enumerate(zip(eq_matrix, eq_joltages)):
         output.append(equation_to_str(equation) + " = " + str(joltage[0]))
+    output.append("")
+
+    for i, button in enumerate(buttons):
+        counters = [joltage_counters[j] for j in range(len(button)) if button[j]]
+        output.append(
+            f"max({letter(i)}) = min({','.join(map(str, counters))}) = {min(counters)}"
+        )
 
     print("\n".join(output), "\n")
 
